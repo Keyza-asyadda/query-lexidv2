@@ -1,0 +1,45 @@
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
+PREFIX dct: <http://purl.org/dc/terms/> 
+PREFIX lexid-s: <https://w3id.org/lex-id/schema/> 
+PREFIX lexid: <https://w3id.org/lex-id/data/> 
+SELECT distinct (lcase(group_concat(distinct ?value; separator = "\n")) as ?answer)
+WHERE
+{
+  {
+    SELECT distinct ?year ?number ?article
+    (lcase(concat(?larticle, " ", coalesce(?lsection, ""))) as ?lcontent) ?value
+    {
+        ?document a lexid-s:LegalDocument;
+            rdfs:label "legal_title"^^xsd:string ;
+            lexid-s:hasContent/lexid-s:hasPart* ?parent ;
+            lexid-s:amendedBy [
+              lexid-s:hasContent/lexid-s:modifies ?modification;
+              lexid-s:regulationYear ?year ;
+              lexid-s:regulationNumber ?number ;
+          ] .
+        ?modification lexid-s:hasModificationTarget ?parent ;
+        lexid-s:hasModificationContent [ lexid-s:hasPart* ?article ;] .
+        ?article a lexid-s:Article ;
+            rdfs:label ?larticle .
+        {
+          {
+            ?article lexid-s:hasPart [
+              a lexid-s:Section ;
+              rdfs:label ?lsection ;
+              dct:description ?value ;
+            ] .
+          }
+          UNION
+          {
+            ?article dct:description ?value .
+          }
+        }
+    }
+  }
+  FILTER regex(str(?lcontent), "pasal_num ayat_num", "i")
+}
+GROUP BY ?year ?number ?article
+ORDER BY desc(?year) desc(?number)
+LIMIT 1

@@ -1,0 +1,11 @@
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
+PREFIX lexid-s: <https://w3id.org/lex-id/schema/> 
+PREFIX lexid: <https://w3id.org/lex-id/data/> 
+SELECT (count(*) as ?answer)
+WHERE {
+    ?LegalDocument a lexid-s:LegalDocument ;
+    rdfs:label "legal_title"^^xsd:string ;
+    lexid-s:hasContent/lexid-s:hasPart*/a lexid-s:Article .
+}

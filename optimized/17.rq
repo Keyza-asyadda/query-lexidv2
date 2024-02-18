@@ -1,0 +1,12 @@
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
+PREFIX lexid-s: <https://w3id.org/lex-id/schema/> 
+PREFIX lexid: <https://w3id.org/lex-id/data/> 
+SELECT (IF(count(distinct ?d) > 0, "Tidak", "Ya") as ?answer) 
+WHERE {
+    ?d a lexid-s:LegalDocument ;
+    	lexid-s:repeals ?repealed .
+    ?repealed a lexid-s:LegalDocument ;
+    	rdfs:label "legal_title"^^xsd:string .
+}
